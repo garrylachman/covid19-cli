@@ -16,7 +16,7 @@
 ## Usage
 
 ```
-sh covid19-cli.sh -h
+bash covid19-cli.sh -h
 ```
 
 Or if you prefer to make it executable:
