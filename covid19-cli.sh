@@ -146,7 +146,7 @@ while [[ $1 = -?* ]]; do
   case $1 in
     -h|--help) usage >&2; safe_exit ;;
     --version) out "$(basename $0) $version"; safe_exit ;;
-    -c|--country) country=$2 shift ;;
+    -c|--country) country=$2; shift ;;
     -l|--list-all) list_all=1 ;;
     --endopts) shift; break ;;
     *) die "invalid option: $1" ;;
