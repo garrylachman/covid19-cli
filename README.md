@@ -1,4 +1,5 @@
- ```Corona Virus (Covid-19) statistics cli.
+ ```
+ Corona Virus (Covid-19) statistics cli.
 
  MIT License
  Copyright (c) 2020 Garry Lachman
