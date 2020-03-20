@@ -13,6 +13,19 @@
       --version     Output version information and exit
 ```
 
+## Usage
+
+```
+sh covid19-cli.sh -h
+```
+
+Or if you prefer to make it executable:
+
+```
+chmod +x covid19-cli.sh
+./covid19-cli.sh -h
+```
 
 ## Dependencies
+* bash (https://www.gnu.org/software/bash/)
 * jq (https://stedolan.github.io/jq/)
