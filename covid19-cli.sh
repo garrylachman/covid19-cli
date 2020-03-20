@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 #
 # Corona Virus (Covid-19) statistics cli,
 #
