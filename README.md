@@ -1,4 +1,4 @@
- Corona Virus (Covid-19) statistics cli.
+ ```Corona Virus (Covid-19) statistics cli.
 
  MIT License
  Copyright (c) 2020 Garry Lachman
@@ -10,7 +10,7 @@
                     this through the interactive option
   -h, --help        Display this help and exit
       --version     Output version information and exit
-
+```
 
 
 ## Dependencies
