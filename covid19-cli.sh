@@ -68,8 +68,7 @@ usage() {
 
  Options:
   -c, --country     Specific Country
-  -l, --list-all         List all countries
-                    this through the interactive option
+  -l, --list-all    List all countries
   -h, --help        Display this help and exit
       --version     Output version information and exit
 "
