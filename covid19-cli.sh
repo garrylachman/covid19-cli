@@ -21,6 +21,130 @@ args=()
 # }}}
 # Helpers {{{
 
+function printTable()
+{
+    local -r delimiter="${1}"
+    local -r tableData="$(removeEmptyLines "${2}")"
+    local -r colorHeader="${3}"
+    local -r displayTotalCount="${4}"
+
+    if [[ "${delimiter}" != '' && "$(isEmptyString "${tableData}")" = 'false' ]]
+    then
+        local -r numberOfLines="$(trimString "$(wc -l <<< "${tableData}")")"
+
+        if [[ "${numberOfLines}" -gt '0' ]]
+        then
+            local table=''
+            local i=1
+
+            for ((i = 1; i <= "${numberOfLines}"; i = i + 1))
+            do
+                local line=''
+                line="$(sed "${i}q;d" <<< "${tableData}")"
+
+                local numberOfColumns=0
+                numberOfColumns="$(awk -F "${delimiter}" '{print NF}' <<< "${line}")"
+
+                # Add Line Delimiter
+
+                if [[ "${i}" -eq '1' ]]
+                then
+                    table="${table}$(printf '%s#+' "$(repeatString '#+' "${numberOfColumns}")")"
+                fi
+
+                # Add Header Or Body
+
+                table="${table}\n"
+
+                local j=1
+
+                for ((j = 1; j <= "${numberOfColumns}"; j = j + 1))
+                do
+                    table="${table}$(printf '#|  %s' "$(cut -d "${delimiter}" -f "${j}" <<< "${line}")")"
+                done
+
+                table="${table}#|\n"
+
+                # Add Line Delimiter
+
+                if [[ "${i}" -eq '1' ]] || [[ "${numberOfLines}" -gt '1' && "${i}" -eq "${numberOfLines}" ]]
+                then
+                    table="${table}$(printf '%s#+' "$(repeatString '#+' "${numberOfColumns}")")"
+                fi
+            done
+
+            if [[ "$(isEmptyString "${table}")" = 'false' ]]
+            then
+                local output=''
+                output="$(echo -e "${table}" | column -s '#' -t | awk '/^\+/{gsub(" ", "-", $0)}1')"
+
+                if [[ "${colorHeader}" = 'true' ]]
+                then
+                    echo -e "\033[1;32m$(head -n 3 <<< "${output}")\033[0m"
+                    tail -n +4 <<< "${output}"
+                else
+                    echo "${output}"
+                fi
+            fi
+        fi
+
+        if [[ "${displayTotalCount}" = 'true' && "${numberOfLines}" -ge '0' ]]
+        then
+            echo -e "\n\033[1;36mTOTAL ROWS : $((numberOfLines - 1))\033[0m"
+        fi
+    fi
+}
+
+function isEmptyString()
+{
+    local -r string="${1}"
+
+    if [[ "$(trimString "${string}")" = '' ]]
+    then
+        echo 'true' && return 0
+    fi
+
+    echo 'false' && return 1
+}
+
+function removeEmptyLines()
+{
+    local -r content="${1}"
+
+    echo -e "${content}" | sed '/^\s*$/d'
+}
+
+function trimString()
+{
+    local -r string="${1}"
+
+    sed 's,^[[:blank:]]*,,' <<< "${string}" | sed 's,[[:blank:]]*$,,'
+}
+
+function repeatString()
+{
+    local -r string="${1}"
+    local -r numberToRepeat="${2}"
+
+    if [[ "${string}" != '' && "$(isPositiveInteger "${numberToRepeat}")" = 'true' ]]
+    then
+        local -r result="$(printf "%${numberToRepeat}s")"
+        echo -e "${result// /${string}}"
+    fi
+}
+
+function isPositiveInteger()
+{
+    local -r string="${1}"
+
+    if [[ "${string}" =~ ^[1-9][0-9]*$ ]]
+    then
+        echo 'true' && return 0
+    fi
+
+    echo 'false' && return 1
+}
+
 out() {
   ((quiet)) && return
 
@@ -53,7 +177,7 @@ notify() { [[ $? == 0 ]] && success "$@" || err "$@"; }
 # Escape a string
 escape() { echo $@ | sed 's/\//\\\//g'; }
 
-version="v0.1"
+version="v0.1.1"
 
 # Print usage
 usage() {
@@ -93,6 +217,9 @@ output() {
     echo "${bold}Cases: ${normal}${yellow}$1${white}, ${bold}Deaths: ${normal}${red}$2${white}, ${bold}Recovered: ${normal}${green}$3";
 }
 
+function join_by { local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d}"; }
+
+
 main() {
   banner
   if [[ -n "$country"  && "$list_all" == 1 ]]; then
@@ -101,8 +228,27 @@ main() {
   fi;
   
   if [ "$list_all" == 1 ]; then
+    # The part can be re-factored in better way...
     success "List all Countries"
-    curl -s $API_ALL_COUNTRIES_ENDPOINT | jq -c '.[]' | column -t -s'[],"'
+    success "Please wait while we retrieve the data..."
+    result=$(curl -s $API_ALL_COUNTRIES_ENDPOINT/)
+    cols=(country cases active critical deaths recovered todayCases todayDeaths casesPerOneMillion)
+    titles=(Country Cases Active Critical Deaths Recovered Today-Cases Today-Deaths Cases-Per-One-Million)
+    lines=()
+    lines+=($(join_by , "${titles[@]}"))
+    for row in $(echo "${result}" | jq -r '.[] | @base64'); do
+      plainRow=$(echo "${row}" | base64 --decode)
+      line=()
+      for k in "${cols[@]}"; do
+        val=$(echo $plainRow | jq -r ".${k}")
+        line+=("$val")
+      done
+      line=$(join_by , "${line[@]}")
+      lines+=("$line")
+    done
+    resultStr=$(join_by "\n" "${lines[@]}")
+    printTable "," "$resultStr"
+
   elif [ -n "$country" ]; then
     success "Country: $country"
     result=$(curl -s $API_ALL_COUNTRIES_ENDPOINT/$country)
