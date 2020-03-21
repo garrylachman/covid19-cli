@@ -41,6 +41,11 @@ success() { out " \033[1;32m✔\033[0m  $@"; }
 bold=$(tput bold)
 normal=$(tput sgr0)
 
+# colours
+green=$(tput setaf 2)
+red=$(tput setaf 1)
+white=$(tput setaf 7)
+yellow=$(tput setaf 3)
 
 # Notify on function success
 notify() { [[ $? == 0 ]] && success "$@" || err "$@"; }
@@ -73,6 +78,10 @@ usage() {
 # Set a trap for cleaning up in case of errors or when script exits.
 
 # Put your script here
+output() {
+    echo "${bold}Cases: ${normal}${yellow}$1${white}, ${bold}Deaths: ${normal}${red}$2${white}, ${bold}Recovered: ${normal}${green}$3";
+}
+
 main() {
   if [[ -n "$country"  && "$list_all" == 1 ]]; then
     err "--country (-c) and --list-all (-l) cannot be mixed together"
@@ -89,7 +98,7 @@ main() {
     deaths=$(echo $result | jq ".deaths")
     recovered=$(echo $result | jq ".recovered")
 
-    echo "${bold}Cases: ${normal}$cases, ${bold}Deaths: ${normal}$deaths, ${bold}Recovered:${normal} $recovered";
+    output $cases $deaths $recovered
   else
     success "Global Statistics"
     result=$(curl -s $API_TOTAL_ENDPOINT)
@@ -97,7 +106,7 @@ main() {
     deaths=$(echo $result | jq ".deaths")
     recovered=$(echo $result | jq ".recovered")
 
-    echo "${bold}Cases: ${normal}$cases, ${bold}Deaths: ${normal}$deaths, ${bold}Recovered:${normal} $recovered";
+    output $cases $deaths $recovered
   fi;
 
 }
