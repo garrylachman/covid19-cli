@@ -57,7 +57,8 @@ version="v0.1"
 
 # Print usage
 usage() {
-  echo -n "$(basename $0) [OPTION]...
+  banner
+  echo "$(basename $0) [OPTION]...
 
  Corona Virus (Covid-19) statistics cli.
 
@@ -74,6 +75,17 @@ usage() {
 "
 }
 
+banner() {
+    echo "
+_________             .__    ._______ ________          _________ .____    .___ 
+\_   ___ \  _______  _|__| __| _/_   /   __   \         \_   ___ \|    |   |   |
+/    \  \/ /  _ \  \/ /  |/ __ | |   \____    /  ______ /    \  \/|    |   |   |
+\     \___(  <_> )   /|  / /_/ | |   |  /    /  /_____/ \     \___|    |___|   |
+ \______  /\____/ \_/ |__\____ | |___| /____/            \______  /_______ \___|
+        \/                    \/                                \/        \/        
+"
+}
+
 
 # Set a trap for cleaning up in case of errors or when script exits.
 
@@ -83,6 +95,7 @@ output() {
 }
 
 main() {
+  banner
   if [[ -n "$country"  && "$list_all" == 1 ]]; then
     err "--country (-c) and --list-all (-l) cannot be mixed together"
     die
