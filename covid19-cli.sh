@@ -6,7 +6,7 @@
 # Copyright (c) 2020 Garry Lachman
 # https://github.com/garrylachman/covid19-cli
 
-BASE_API="https://coronavirus-19-api.herokuapp.com"
+BASE_API="https://corona.lmao.ninja"
 API_TOTAL_ENDPOINT="$BASE_API/all"
 API_ALL_COUNTRIES_ENDPOINT="$BASE_API/countries"
 
@@ -155,22 +155,6 @@ function ProgressBar {
   printf "\rProgress : [${_fill// /#}${_empty// /-}] ${_progress}%%\r"
 }
 
-# Pure bash "cURL" alternative
-function __curl() {
-  read proto server path <<<$(echo ${1//// })
-  DOC=/${path// //}
-  HOST=${server//:*}
-  PORT=${server//*:}
-  [[ x"${HOST}" == x"${PORT}" ]] && PORT=80
-
-  exec 3<>/dev/tcp/${HOST}/$PORT
-  echo -en "GET ${DOC} HTTP/1.0\r\nHost: ${HOST}\r\n\r\n" >&3
-  (while read line; do
-   [[ "$line" == $'\r' ]] && break
-  done && cat) <&3
-  exec 3>&-
-}
-
 out() {
   ((quiet)) && return
 
@@ -203,11 +187,15 @@ notify() { [[ $? == 0 ]] && success "$@" || err "$@"; }
 # Escape a string
 escape() { echo $@ | sed 's/\//\\\//g'; }
 
-version="v0.1.6"
+version="v0.1.7"
 
 check_dependencies() {
   if ! [ -x "$(command -v jq)" ]; then
     err 'Error: jq is not installed.\nhttps://stedolan.github.io/jq/' >&2
+    die
+  fi
+  if ! [ -x "$(command -v curl)" ]; then
+    err 'Error: curl is not installed.\nhttps://github.com/curl/curl' >&2
     die
   fi
 }
@@ -226,6 +214,7 @@ usage() {
  Options:
   -c, --country     Specific Country
   -l, --list-all    List all countries
+  -s, --sort        Sort countries list by key (country|cases|active|critical|deaths|recovered|todayCases|todayDeaths|casesPerOneMillion)
   -h, --help        Display this help and exit
       --version     Output version information and exit
 "
@@ -260,13 +249,16 @@ main() {
     err "--country (-c) and --list-all (-l) cannot be mixed together"
     die
   fi;
-  
+
   if [ "$list_all" == 1 ]; then
     # The part can be re-factored in better way...
     success "List all Countries"
+    if [ -n "$sort_by" ]; then
+      success "Sory by key: $sort_by"
+    fi
     success "Please wait while we: "
     success "- Retrieve & preparing the data..."
-    result=$(__curl $API_ALL_COUNTRIES_ENDPOINT/)
+    result=$(curl -s "$API_ALL_COUNTRIES_ENDPOINT/?sort=$sort_by")
     cols=(country cases active critical deaths recovered todayCases todayDeaths casesPerOneMillion)
     titles=(Country Cases Active Critical Deaths Recovered Today-Cases Today-Deaths Cases-Per-One-Million)
     lines=()
@@ -293,7 +285,7 @@ main() {
 
   elif [ -n "$country" ]; then
     success "Country: $country"
-    result=$(__curl $API_ALL_COUNTRIES_ENDPOINT/$country)
+    result=$(curl -s $API_ALL_COUNTRIES_ENDPOINT/$country)
     cases=$(echo $result | jq ".cases")
     deaths=$(echo $result | jq ".deaths")
     recovered=$(echo $result | jq ".recovered")
@@ -301,7 +293,7 @@ main() {
     output $cases $deaths $recovered
   else
     success "Global Statistics"
-    result=$(__curl $API_TOTAL_ENDPOINT)
+    result=$(curl -s $API_TOTAL_ENDPOINT)
     cases=$(echo $result | jq ".cases")
     deaths=$(echo $result | jq ".deaths")
     recovered=$(echo $result | jq ".recovered")
@@ -357,6 +349,7 @@ while [[ $1 = -?* ]]; do
     --version) out "$(basename $0) $version"; safe_exit ;;
     -c|--country) country=$2; shift ;;
     -l|--list-all) list_all=1 ;;
+    -s|--sort) sort_by=$2 ;;
     --endopts) shift; break ;;
     *) die "invalid option: $1" ;;
   esac
