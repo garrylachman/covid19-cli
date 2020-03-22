@@ -37,3 +37,10 @@ chmod +x covid19-cli.sh
 * bash (https://www.gnu.org/software/bash/)
 * jq (https://stedolan.github.io/jq/)
 * cURL (https://github.com/curl/curl)
+
+## Ego Boosters
+![GitHub](https://img.shields.io/github/license/garrylachman/covid19-cli?style=flat-square)
+![GitHub All Releases](https://img.shields.io/github/downloads/garrylachman/covid19-cli/total?style=flat-square)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/garrylachman/covid19-cli?style=flat-square)
+![GitHub Release Date](https://img.shields.io/github/release-date/garrylachman/covid19-cli?style=flat-square)
+![GitHub contributors](https://img.shields.io/github/contributors/garrylachman/covid19-cli?style=flat-square)
