@@ -232,7 +232,7 @@ spark()
   _echoSP
 }
 
-version="v0.1.8"
+version="v0.1.9"
 
 check_dependencies() {
   if ! [ -x "$(command -v jq)" ]; then
