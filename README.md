@@ -33,6 +33,10 @@ chmod +x covid19-cli.sh
 ./covid19-cli.sh -h
 ```
 
+## Screenshots
+![Screenshot 1](https://i.imgur.com/RuECDg9.gif)
+![Screenshot 2](https://i.imgur.com/osrONDc.gif)
+
 ## Dependencies
 * bash (https://www.gnu.org/software/bash/)
 * jq (https://stedolan.github.io/jq/)
