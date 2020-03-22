@@ -187,7 +187,7 @@ notify() { [[ $? == 0 ]] && success "$@" || err "$@"; }
 # Escape a string
 escape() { echo $@ | sed 's/\//\\\//g'; }
 
-version="v0.1.1"
+version="v0.1.2"
 
 # Print usage
 usage() {
