@@ -36,3 +36,4 @@ chmod +x covid19-cli.sh
 ## Dependencies
 * bash (https://www.gnu.org/software/bash/)
 * jq (https://stedolan.github.io/jq/)
+* cURL (https://github.com/curl/curl)
