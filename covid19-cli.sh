@@ -39,6 +39,7 @@ function printTable()
 
             for ((i = 1; i <= "${numberOfLines}"; i = i + 1))
             do
+                ProgressBar ${i} ${numberOfLines}
                 local line=''
                 line="$(sed "${i}q;d" <<< "${tableData}")"
 
@@ -145,6 +146,15 @@ function isPositiveInteger()
     echo 'false' && return 1
 }
 
+function ProgressBar {
+  let _progress=(${1}*100/${2}*100)/100
+  let _done=(${_progress}*4)/10
+  let _left=40-$_done
+  _fill=$(printf "%${_done}s")
+  _empty=$(printf "%${_left}s")
+  printf "\rProgress : [${_fill// /#}${_empty// /-}] ${_progress}%%\r"
+}
+
 out() {
   ((quiet)) && return
 
@@ -221,6 +231,7 @@ function join_by { local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d
 
 
 main() {
+
   banner
   if [[ -n "$country"  && "$list_all" == 1 ]]; then
     err "--country (-c) and --list-all (-l) cannot be mixed together"
@@ -230,13 +241,18 @@ main() {
   if [ "$list_all" == 1 ]; then
     # The part can be re-factored in better way...
     success "List all Countries"
-    success "Please wait while we retrieve the data..."
+    success "Please wait while we: "
+    success "- Retrieve & preparing the data..."
     result=$(curl -s $API_ALL_COUNTRIES_ENDPOINT/)
     cols=(country cases active critical deaths recovered todayCases todayDeaths casesPerOneMillion)
     titles=(Country Cases Active Critical Deaths Recovered Today-Cases Today-Deaths Cases-Per-One-Million)
     lines=()
     lines+=($(join_by , "${titles[@]}"))
+    cnt=0
+    _start=1
+    _end=188
     for row in $(echo "${result}" | jq -r '.[] | @base64'); do
+      ProgressBar ${cnt} ${_end}  
       plainRow=$(echo "${row}" | base64 --decode)
       line=()
       for k in "${cols[@]}"; do
@@ -245,8 +261,11 @@ main() {
       done
       line=$(join_by , "${line[@]}")
       lines+=("$line")
+      ((cnt=cnt+1))
     done
     resultStr=$(join_by "\n" "${lines[@]}")
+    echo ""
+    success "- Bulding data tables"
     printTable "," "$resultStr"
 
   elif [ -n "$country" ]; then
