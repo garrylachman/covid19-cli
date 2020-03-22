@@ -14,8 +14,8 @@
 
  Options:
   -c, --country     Specific Country
-  -l, --list-all         List all countries
-                    this through the interactive option
+  -l, --list-all    List all countries
+  -s, --sort        Sort countries list by key (country|cases|active|critical|deaths|recovered|todayCases|todayDeaths|casesPerOneMillion)
   -h, --help        Display this help and exit
       --version     Output version information and exit
 ```
@@ -40,6 +40,7 @@ chmod +x covid19-cli.sh
 ## Dependencies
 * bash (https://www.gnu.org/software/bash/)
 * jq (https://stedolan.github.io/jq/)
+* cURL (https://github.com/curl/curl)
 
 ## Ego Boosters
 ![GitHub](https://img.shields.io/github/license/garrylachman/covid19-cli?style=flat-square)
@@ -47,3 +48,4 @@ chmod +x covid19-cli.sh
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/garrylachman/covid19-cli?style=flat-square)
 ![GitHub Release Date](https://img.shields.io/github/release-date/garrylachman/covid19-cli?style=flat-square)
 ![GitHub contributors](https://img.shields.io/github/contributors/garrylachman/covid19-cli?style=flat-square)
+![Analytics](https://ga-beacon.appspot.com/UA-161573879-1/github/readme?flat&useReferer)
