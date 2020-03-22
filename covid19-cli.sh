@@ -10,7 +10,7 @@ BASE_API="https://coronavirus-19-api.herokuapp.com"
 API_TOTAL_ENDPOINT="$BASE_API/all"
 API_ALL_COUNTRIES_ENDPOINT="$BASE_API/countries"
 
-set -e
+#set -e
 
 # Detect whether output is piped or not.
 [[ -t 1 ]] && piped=0 || piped=1
@@ -203,7 +203,7 @@ notify() { [[ $? == 0 ]] && success "$@" || err "$@"; }
 # Escape a string
 escape() { echo $@ | sed 's/\//\\\//g'; }
 
-version="v0.1.5"
+version="v0.1.6"
 
 check_dependencies() {
   if ! [ -x "$(command -v jq)" ]; then
