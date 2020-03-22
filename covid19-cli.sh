@@ -9,6 +9,7 @@
 BASE_API="https://corona.lmao.ninja"
 API_TOTAL_ENDPOINT="$BASE_API/all"
 API_ALL_COUNTRIES_ENDPOINT="$BASE_API/countries"
+API_HISTORICAL_COUNTRIES_ENDPOINT="$BASE_API/historical"
 
 #set -e
 
@@ -187,7 +188,51 @@ notify() { [[ $? == 0 ]] && success "$@" || err "$@"; }
 # Escape a string
 escape() { echo $@ | sed 's/\//\\\//g'; }
 
-version="v0.1.7"
+_echoSP()
+{
+  if [ "X$1" = "X-n" ]; then
+    shift
+    printf "%s" "$*"
+  else
+    printf "%s\n" "$*"
+  fi
+}
+
+spark()
+{
+  local n numbers=
+
+  # find min/max values
+  local min=0xffffffff max=0
+
+  for n in ${@//,/ }
+  do
+    # on Linux (or with bash4) we could use `printf %.0f $n` here to
+    # round the number but that doesn't work on OS X (bash3) nor does
+    # `awk '{printf "%.0f",$1}' <<< $n` work, so just cut it off
+    n=${n%.*}
+    (( n < min )) && min=$n
+    (( n > max )) && max=$n
+    numbers=$numbers${numbers:+ }$n
+  done
+
+  # print ticks
+  local ticks=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
+
+  # use a high tick if data is constant
+  (( min == max )) && ticks=(▅ ▆)
+
+  local f=$(( (($max-$min)<<8)/(${#ticks[@]}-1) ))
+  (( f < 1 )) && f=1
+
+  for n in $numbers
+  do
+    _echoSP -n ${ticks[$(( ((($n-$min)<<8)/$f) ))]}
+  done
+  _echoSP
+}
+
+version="v0.1.8"
 
 check_dependencies() {
   if ! [ -x "$(command -v jq)" ]; then
@@ -231,13 +276,6 @@ _________             .__    ._______ ________          _________ .____    .___
 "
 }
 
-
-# Set a trap for cleaning up in case of errors or when script exits.
-
-# Put your script here
-output() {
-    echo "${bold}Cases: ${normal}${yellow}$1${white}, ${bold}Deaths: ${normal}${red}$2${white}, ${bold}Recovered: ${normal}${green}$3";
-}
 
 function join_by { local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d}"; }
 
@@ -286,11 +324,21 @@ main() {
   elif [ -n "$country" ]; then
     success "Country: $country"
     result=$(curl -s $API_ALL_COUNTRIES_ENDPOINT/$country)
+    historicalResult=$(curl -s $API_HISTORICAL_COUNTRIES_ENDPOINT/$country)
+
     cases=$(echo $result | jq ".cases")
     deaths=$(echo $result | jq ".deaths")
     recovered=$(echo $result | jq ".recovered")
 
-    output $cases $deaths $recovered
+    casesHistorical=$(echo $historicalResult | jq -r '.timeline .cases | map(.|tostring) | join(",")')
+    deathsHistorical=$(echo $historicalResult | jq -r '.timeline .deaths | map(.|tostring) | join(",")')
+    recoveredHistorical=$(echo $historicalResult | jq -r '.timeline .recovered | map(.|tostring) | join(",")')
+
+    printf "\n"
+    printf "${bold}Cases:\t\t${normal}${yellow}${cases}\t$(spark ${casesHistorical})${white}\n"
+    printf "${bold}Deaths:\t\t${normal}${red}${deaths}\t$(spark ${deathsHistorical})${white}\n"
+    printf "${bold}Recovered:\t${normal}${green}${recovered}\t$(spark ${recoveredHistorical})${white}\n"
+
   else
     success "Global Statistics"
     result=$(curl -s $API_TOTAL_ENDPOINT)
@@ -298,7 +346,10 @@ main() {
     deaths=$(echo $result | jq ".deaths")
     recovered=$(echo $result | jq ".recovered")
 
-    output $cases $deaths $recovered
+    printf "\n"
+    printf "${bold}Cases:\t\t${normal}${yellow}${cases}${white}\n"
+    printf "${bold}Deaths:\t\t${normal}${red}${deaths}${white}\n"
+    printf "${bold}Recovered:\t${normal}${green}${recovered}${white}\n"
   fi;
 
 }

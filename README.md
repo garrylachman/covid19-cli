@@ -42,6 +42,9 @@ chmod +x covid19-cli.sh
 * jq (https://stedolan.github.io/jq/)
 * cURL (https://github.com/curl/curl)
 
+# Credits
+* Spark (https://github.com/holman/spark)
+
 ## Ego Boosters
 ![GitHub](https://img.shields.io/github/license/garrylachman/covid19-cli?style=flat-square)
 ![GitHub All Releases](https://img.shields.io/github/downloads/garrylachman/covid19-cli/total?style=flat-square)
