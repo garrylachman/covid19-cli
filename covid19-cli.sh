@@ -10,7 +10,7 @@ BASE_API="https://coronavirus-19-api.herokuapp.com"
 API_TOTAL_ENDPOINT="$BASE_API/all"
 API_ALL_COUNTRIES_ENDPOINT="$BASE_API/countries"
 
-#set -e
+set -e
 
 # Detect whether output is piped or not.
 [[ -t 1 ]] && piped=0 || piped=1
@@ -203,7 +203,14 @@ notify() { [[ $? == 0 ]] && success "$@" || err "$@"; }
 # Escape a string
 escape() { echo $@ | sed 's/\//\\\//g'; }
 
-version="v0.1.3"
+version="v0.1.5"
+
+check_dependencies() {
+  if ! [ -x "$(command -v jq)" ]; then
+    err 'Error: jq is not installed.\nhttps://stedolan.github.io/jq/' >&2
+    die
+  fi
+}
 
 # Print usage
 usage() {
@@ -247,7 +254,7 @@ function join_by { local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d
 
 
 main() {
-
+  check_dependencies
   banner
   if [[ -n "$country"  && "$list_all" == 1 ]]; then
     err "--country (-c) and --list-all (-l) cannot be mixed together"
