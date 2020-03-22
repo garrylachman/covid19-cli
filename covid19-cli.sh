@@ -227,11 +227,13 @@ usage() {
   -c, --country     Specific Country
   -l, --list-all    List all countries
   -h, --help        Display this help and exit
+  -n, --no-banner   Hides \"Covid19-CLI\" banner
       --version     Output version information and exit
 "
 }
 
 banner() {
+    if [[ "$nobanner" != true ]]; then
     echo "
 _________             .__    ._______ ________          _________ .____    .___ 
 \_   ___ \  _______  _|__| __| _/_   /   __   \         \_   ___ \|    |   |   |
@@ -240,6 +242,7 @@ _________             .__    ._______ ________          _________ .____    .___
  \______  /\____/ \_/ |__\____ | |___| /____/            \______  /_______ \___|
         \/                    \/                                \/        \/        
 "
+    fi
 }
 
 
@@ -353,6 +356,7 @@ safe_exit() {
 
 while [[ $1 = -?* ]]; do
   case $1 in
+    -n|--no-banner) nobanner=true;;
     -h|--help) usage >&2; safe_exit ;;
     --version) out "$(basename $0) $version"; safe_exit ;;
     -c|--country) country=$2; shift ;;
