@@ -48,4 +48,4 @@ chmod +x covid19-cli.sh
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/garrylachman/covid19-cli?style=flat-square)
 ![GitHub Release Date](https://img.shields.io/github/release-date/garrylachman/covid19-cli?style=flat-square)
 ![GitHub contributors](https://img.shields.io/github/contributors/garrylachman/covid19-cli?style=flat-square)
-![Analytics](https://predix-beacon.appspot.com/UA-161573879-1/github/master?flat&useReferer)
+![Analytics](https://predix-beacon.appspot.com/UA-161573879-1?flat&useReferer)
