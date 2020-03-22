@@ -155,6 +155,22 @@ function ProgressBar {
   printf "\rProgress : [${_fill// /#}${_empty// /-}] ${_progress}%%\r"
 }
 
+# Pure bash "cURL" alternative
+function __curl() {
+  read proto server path <<<$(echo ${1//// })
+  DOC=/${path// //}
+  HOST=${server//:*}
+  PORT=${server//*:}
+  [[ x"${HOST}" == x"${PORT}" ]] && PORT=80
+
+  exec 3<>/dev/tcp/${HOST}/$PORT
+  echo -en "GET ${DOC} HTTP/1.0\r\nHost: ${HOST}\r\n\r\n" >&3
+  (while read line; do
+   [[ "$line" == $'\r' ]] && break
+  done && cat) <&3
+  exec 3>&-
+}
+
 out() {
   ((quiet)) && return
 
@@ -187,7 +203,7 @@ notify() { [[ $? == 0 ]] && success "$@" || err "$@"; }
 # Escape a string
 escape() { echo $@ | sed 's/\//\\\//g'; }
 
-version="v0.1.2"
+version="v0.1.3"
 
 # Print usage
 usage() {
@@ -243,7 +259,7 @@ main() {
     success "List all Countries"
     success "Please wait while we: "
     success "- Retrieve & preparing the data..."
-    result=$(curl -s $API_ALL_COUNTRIES_ENDPOINT/)
+    result=$(__curl $API_ALL_COUNTRIES_ENDPOINT/)
     cols=(country cases active critical deaths recovered todayCases todayDeaths casesPerOneMillion)
     titles=(Country Cases Active Critical Deaths Recovered Today-Cases Today-Deaths Cases-Per-One-Million)
     lines=()
@@ -270,7 +286,7 @@ main() {
 
   elif [ -n "$country" ]; then
     success "Country: $country"
-    result=$(curl -s $API_ALL_COUNTRIES_ENDPOINT/$country)
+    result=$(__curl $API_ALL_COUNTRIES_ENDPOINT/$country)
     cases=$(echo $result | jq ".cases")
     deaths=$(echo $result | jq ".deaths")
     recovered=$(echo $result | jq ".recovered")
@@ -278,7 +294,7 @@ main() {
     output $cases $deaths $recovered
   else
     success "Global Statistics"
-    result=$(curl -s $API_TOTAL_ENDPOINT)
+    result=$(__curl $API_TOTAL_ENDPOINT)
     cases=$(echo $result | jq ".cases")
     deaths=$(echo $result | jq ".deaths")
     recovered=$(echo $result | jq ".recovered")
