@@ -23,6 +23,7 @@
 ```
 
 ## Usage
+Please download the "compiled" version from [Releases tab](https://github.com/garrylachman/covid19-cli/releases)
 
 ```
 bash covid19-cli.sh -h
@@ -34,6 +35,15 @@ Or if you prefer to make it executable:
 chmod +x covid19-cli.sh
 ./covid19-cli.sh -h
 ```
+
+# Build
+1. Clone the repo
+`git clone https://github.com/garrylachman/covid19-cli.git`
+2. Build
+`make`
+
+The compiled file is located at dist directory
+
 
 ## Screenshots
 ![Screenshot 1](https://i.imgur.com/RuECDg9.gif)
