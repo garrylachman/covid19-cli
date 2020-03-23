@@ -232,7 +232,7 @@ spark()
   _echoSP
 }
 
-version="v0.1.10"
+version="v0.1.11"
 
 check_dependencies() {
   if ! [ -x "$(command -v jq)" ]; then
@@ -257,9 +257,10 @@ usage() {
  https://github.com/garrylachman/covid19-cli
 
  Options:
-  -c, --country     Specific Country
+  -c, --country     Specific Country (actual data + historical)
   -l, --list-all    List all countries
   -s, --sort        Sort countries list by key (country|cases|active|critical|deaths|recovered|todayCases|todayDeaths|casesPerOneMillion)
+  -i, --historical  List all countries historical trend chart 
   -h, --help        Display this help and exit
   -n, --no-banner   Hides \"Covid19-CLI\" banner
       --version     Output version information and exit
@@ -324,7 +325,37 @@ main() {
     success "- Bulding data tables"
     printTable "," "$resultStr"
 
-  elif [ -n "$country" ]; then
+  elif [ -n "$historical_all" ]; then
+    echo "historical_all"
+    success "Historical"
+    result=$(curl -s $API_HISTORICAL_COUNTRIES_ENDPOINT)
+
+    for row in $(echo "${result}" | jq -r '.[] | @base64'); do
+      plainRow=$(echo "${row}" | base64 --decode)
+      #echo $plainRow | jq '. | "\(.country)-\(.province)"'
+      country=$(echo $plainRow | jq -r ".country")
+      province=$(echo $plainRow | jq -r ".province")
+      
+      printf "${bold}${country}"
+      if [ "$province" != "null" ]; then
+        printf " (${province})"
+      fi 
+      printf "${no_color}\n"
+
+      casesHistorical=$(echo $plainRow | jq -r '.timeline .cases | map(.|tostring) | join(",")')
+      deathsHistorical=$(echo $plainRow | jq -r '.timeline .deaths | map(.|tostring) | join(",")')
+      recoveredHistorical=$(echo $plainRow | jq -r '.timeline .recovered | map(.|tostring) | join(",")')
+
+      printf "${bold}Cases:\t\t${yellow}$(spark ${casesHistorical})${no_color}\n"
+      printf "${bold}Deaths:\t\t${red}$(spark ${deathsHistorical})${no_color}\n"
+      printf "${bold}Recovered:\t${green}$(spark ${recoveredHistorical})${no_color}\n"
+
+      printf "\n"
+    done
+
+
+
+  elif [[ -n "$country" &&  !"$historical_all" ]]; then
     success "Country: $country"
     result=$(curl -s $API_ALL_COUNTRIES_ENDPOINT/$country)
     historicalResult=$(curl -s $API_HISTORICAL_COUNTRIES_ENDPOINT/$country)
@@ -405,6 +436,7 @@ while [[ $1 = -?* ]]; do
     -c|--country) country=$2; shift ;;
     -l|--list-all) list_all=1 ;;
     -s|--sort) sort_by=$2 ;;
+    -i|--historical) historical_all=1 ;;
     --endopts) shift; break ;;
     *) die "invalid option: $1" ;;
   esac
