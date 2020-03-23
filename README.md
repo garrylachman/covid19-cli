@@ -13,10 +13,12 @@
  https://github.com/garrylachman/covid19-cli
 
  Options:
-  -c, --country     Specific Country
+  -c, --country     Specific Country (actual data + historical)
   -l, --list-all    List all countries
   -s, --sort        Sort countries list by key (country|cases|active|critical|deaths|recovered|todayCases|todayDeaths|casesPerOneMillion)
+  -i, --historical  List all countries historical trend chart 
   -h, --help        Display this help and exit
+  -n, --no-banner   Hides "Covid19-CLI" banner
       --version     Output version information and exit
 ```
 
