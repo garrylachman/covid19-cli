@@ -6,11 +6,11 @@
 # Copyright (c) 2020 Garry Lachman
 # https://github.com/garrylachman/covid19-cli
 
-source defines.sh
+source src/defines.sh
 
-. libs/tables.sh
-. libs/progress.sh
-. libs/sparkline.sh
+. src/libs/tables.sh
+. src/libs/progress.sh
+. src/libs/sparkline.sh
 
 # Detect whether output is piped or not.
 [[ -t 1 ]] && piped=0 || piped=1
