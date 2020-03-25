@@ -166,11 +166,9 @@ main() {
 
       casesHistorical=$(echo $plainRow | jq -r '.timeline .cases | map(.|tostring) | join(",")')
       deathsHistorical=$(echo $plainRow | jq -r '.timeline .deaths | map(.|tostring) | join(",")')
-      recoveredHistorical=$(echo $plainRow | jq -r '.timeline .recovered | map(.|tostring) | join(",")')
 
       printf "${bold}Cases:\t\t${yellow}$(spark ${casesHistorical})${no_color}\n"
       printf "${bold}Deaths:\t\t${red}$(spark ${deathsHistorical})${no_color}\n"
-      printf "${bold}Recovered:\t${green}$(spark ${recoveredHistorical})${no_color}\n"
 
       printf "\n"
     done
@@ -188,12 +186,11 @@ main() {
 
     casesHistorical=$(echo $historicalResult | jq -r '.timeline .cases | map(.|tostring) | join(",")')
     deathsHistorical=$(echo $historicalResult | jq -r '.timeline .deaths | map(.|tostring) | join(",")')
-    recoveredHistorical=$(echo $historicalResult | jq -r '.timeline .recovered | map(.|tostring) | join(",")')
 
     printf "\n"
     printf "${bold}Cases:\t\t${normal}${yellow}${cases}\t$(spark ${casesHistorical})${no_color}\n"
     printf "${bold}Deaths:\t\t${normal}${red}${deaths}\t$(spark ${deathsHistorical})${no_color}\n"
-    printf "${bold}Recovered:\t${normal}${green}${recovered}\t$(spark ${recoveredHistorical})${no_color}\n"
+    printf "${bold}Recovered:\t${normal}${green}${recovered}${no_color}\n"
 
   else
     success "Global Statistics"
