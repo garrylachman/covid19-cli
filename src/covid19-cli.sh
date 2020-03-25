@@ -6,11 +6,13 @@
 # Copyright (c) 2020 Garry Lachman
 # https://github.com/garrylachman/covid19-cli
 
-source src/defines.sh
+basedir=$( cd `dirname $0`; pwd )
 
-. src/libs/tables.sh
-. src/libs/progress.sh
-. src/libs/sparkline.sh
+source ${basedir}/defines.sh
+
+. ${basedir}/libs/tables.sh
+. ${basedir}/libs/progress.sh
+. ${basedir}/libs/sparkline.sh
 
 # Detect whether output is piped or not.
 [[ -t 1 ]] && piped=0 || piped=1
