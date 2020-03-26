@@ -37,10 +37,9 @@ chmod +x covid19-cli.sh
 ```
 
 # Build
-1. Clone the repo
-`git clone https://github.com/garrylachman/covid19-cli.git`
-2. Build
-`make`
+1. `git clone https://github.com/garrylachman/covid19-cli.git`
+2. `cd cd covid19-cli`
+3. `make`
 
 The compiled file is located at dist directory
 
