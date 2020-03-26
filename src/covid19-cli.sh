@@ -34,8 +34,22 @@ out() {
   printf '%b\n' "$message";
 }
 die() { out "$@"; exit 1; } >&2
-err() { out " \033[1;31m✖\033[0m  $@"; } >&2
-success() { out " \033[1;32m✔\033[0m  $@"; }
+
+err() {
+  if [[ "$rawoutput" == true ]]; then
+    out "$@"
+  else
+    out " \033[1;31m✖\033[0m  $@";
+  fi
+} >&2
+
+success() { 
+  if [[ "$rawoutput" == true ]]; then
+    out "$@"
+  else
+    out " \033[1;32m✔\033[0m  $@";
+  fi
+}
 
 bold=$(tput bold)
 normal=$(tput sgr0)
@@ -83,6 +97,7 @@ usage() {
   -i, --historical  List all countries historical trend chart 
   -h, --help        Display this help and exit
   -n, --no-banner   Hides \"Covid19-CLI\" banner
+  -r, --raw-output  Remove text formatting (colors, bold)
       --version     Output version information and exit
 "
 }
@@ -104,8 +119,21 @@ printf "${no_color}"
 
 function join_by { local d=$1; shift; echo -n "$1"; shift; printf "%s" "${@/#/$d}"; }
 
+set_raw_output() {
+  bold=""
+  normal=""
+
+  # colours
+  green=""
+  no_color=""
+  red=""
+  yellow=""
+}
 
 main() {
+  if [[ "$rawoutput" == true ]]; then
+    set_raw_output
+  fi
   check_dependencies
   banner
   if [[ -n "$country"  && "$list_all" == 1 ]]; then
@@ -250,6 +278,7 @@ safe_exit() {
 while [[ $1 = -?* ]]; do
   case $1 in
     -n|--no-banner) nobanner=true;;
+    -r|--raw-output) rawoutput=true;;
     -h|--help) usage >&2; safe_exit ;;
     --version) out "$(basename $0) $version"; safe_exit ;;
     -c|--country) country=$2; shift ;;
