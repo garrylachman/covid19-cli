@@ -55,6 +55,7 @@ The compiled file is located at dist directory
 
 # Credits
 * Spark (https://github.com/holman/spark)
+* NovelCOVID-API (https://github.com/novelcovid/api)
 
 ## Ego Boosters
 ![GitHub](https://img.shields.io/github/license/garrylachman/covid19-cli?style=flat-square)
