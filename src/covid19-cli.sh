@@ -6,6 +6,8 @@
 # Copyright (c) 2020 Garry Lachman
 # https://github.com/garrylachman/covid19-cli
 
+LC_NUMERIC=en_US
+
 basedir=$( cd `dirname $0`; pwd )
 
 source ${basedir}/defines.sh
@@ -216,9 +218,9 @@ main() {
     deathsHistorical=$(echo $historicalResult | jq -r '.timeline .deaths | map(.|tostring) | join(",")')
 
     printf "\n"
-    printf "${bold}Cases:\t\t${normal}${yellow}${cases}\t$(spark ${casesHistorical})${no_color}\n"
-    printf "${bold}Deaths:\t\t${normal}${red}${deaths}\t$(spark ${deathsHistorical})${no_color}\n"
-    printf "${bold}Recovered:\t${normal}${green}${recovered}${no_color}\n"
+    printf "${bold}Cases:\t\t${normal}${yellow}%'.f\t$(spark ${casesHistorical})${no_color}\n" ${cases}
+    printf "${bold}Deaths:\t\t${normal}${red}%'.f\t$(spark ${deathsHistorical})${no_color}\n" ${deaths}
+    printf "${bold}Recovered:\t${normal}${green}%'.f${no_color}\n" ${recovered}
 
   else
     success "Global Statistics"
@@ -227,10 +229,11 @@ main() {
     deaths=$(echo $result | jq ".deaths")
     recovered=$(echo $result | jq ".recovered")
 
+
     printf "\n"
-    printf "${bold}Cases:\t\t${normal}${yellow}${cases}${no_color}\n"
-    printf "${bold}Deaths:\t\t${normal}${red}${deaths}${no_color}\n"
-    printf "${bold}Recovered:\t${normal}${green}${recovered}${no_color}\n"
+    printf "${bold}Cases:\t\t${normal}${yellow}%'.f${no_color}\n" ${cases}
+    printf "${bold}Deaths:\t\t${normal}${red}%'.f${no_color}\n" ${deaths}
+    printf "${bold}Recovered:\t${normal}${green}%'.f${no_color}\n" ${recovered}
   fi;
 
 }
