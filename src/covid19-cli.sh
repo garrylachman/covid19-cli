@@ -214,13 +214,27 @@ main() {
     deaths=$(echo $result | jq ".deaths")
     recovered=$(echo $result | jq ".recovered")
 
+    todayCases=$(echo $result | jq ".todayCases")
+    todayDeaths=$(echo $result | jq ".todayDeaths")
+    active=$(echo $result | jq ".active")
+    critical=$(echo $result | jq ".critical")
+    casesPerOneMillion=$(echo $result | jq ".casesPerOneMillion")
+    deathsPerOneMillion=$(echo $result | jq ".deathsPerOneMillion")
+
     casesHistorical=$(echo $historicalResult | jq -r '.timeline .cases | map(.|tostring) | join(",")')
     deathsHistorical=$(echo $historicalResult | jq -r '.timeline .deaths | map(.|tostring) | join(",")')
 
     printf "\n"
-    printf "${bold}Cases:\t\t${normal}${yellow}%'.f\t$(spark ${casesHistorical})${no_color}\n" ${cases}
-    printf "${bold}Deaths:\t\t${normal}${red}%'.f\t$(spark ${deathsHistorical})${no_color}\n" ${deaths}
-    printf "${bold}Recovered:\t${normal}${green}%'.f${no_color}\n" ${recovered}
+    printf "${bold}Cases:\t\t\t${normal}${yellow}%'.f\t$(spark ${casesHistorical})${no_color}\n" ${cases}
+    printf "${bold}Deaths:\t\t\t${normal}${red}%'.f\t$(spark ${deathsHistorical})${no_color}\n" ${deaths}
+    printf "${bold}Recovered:\t\t${normal}${green}%'.f${no_color}\n" ${recovered}
+    printf "${bold}Active:\t\t\t${normal}%'.f\n" ${active}
+    printf "${bold}Critical:\t\t${normal}%'.f\n" ${critical}
+    printf "${bold}Today Cases:\t\t${normal}%'.f\n" ${todayCases}
+    printf "${bold}Today Deaths:\t\t${normal}%'.f\n" ${todayDeaths}
+    printf "${bold}Cases / Million:\t${normal}%'.f\n" ${casesPerOneMillion}
+    printf "${bold}Deaths / Million:\t${normal}%'.f\n" ${deathsPerOneMillion}
+
 
   else
     success "Global Statistics"
